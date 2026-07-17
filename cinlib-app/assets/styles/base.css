@@ -1,0 +1,138 @@
+/* ============================================================
+   CinLib — Base Stylesheet
+   Design tokens live here. All component styles reference these.
+   ============================================================ */
+
+/* ── Design tokens ─────────────────────────────────────────── */
+:root {
+  /* Colour palette — deep cinema dark with vivid accent */
+  --color-bg:           #0d0f14;
+  --color-surface:      #161921;
+  --color-surface-alt:  #1e2230;
+  --color-border:       rgba(255, 255, 255, 0.07);
+
+  --color-accent:       #e05c2e;        /* warm amber-red */
+  --color-accent-hover: #f07040;
+  --color-accent-glow:  rgba(224, 92, 46, 0.35);
+
+  --color-text-primary:   #f0f2f7;
+  --color-text-secondary: #8c95a8;
+  --color-text-muted:     #4a5168;
+
+  /* Typography */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  /* Spacing scale (multiples of 4 px) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* Border radius */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm:  0 1px 3px rgba(0,0,0,0.4);
+  --shadow-md:  0 4px 16px rgba(0,0,0,0.5);
+  --shadow-lg:  0 12px 40px rgba(0,0,0,0.6);
+  --shadow-glow: 0 0 32px var(--color-accent-glow);
+
+  /* Transitions */
+  --transition-fast:   120ms ease;
+  --transition-normal: 220ms ease;
+  --transition-slow:   400ms ease;
+}
+
+/* ── Reset ──────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;         /* desktop app — no OS scrollbar */
+}
+
+#main {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Splash screen ──────────────────────────────────────────── */
+.splash {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  gap: var(--space-6);
+  background:
+    radial-gradient(ellipse 60% 50% at 50% 40%, rgba(224,92,46,0.12) 0%, transparent 70%),
+    var(--color-bg);
+  animation: splash-fade-in 0.8s var(--transition-slow) both;
+}
+
+.splash__logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.splash__icon {
+  font-size: 64px;
+  filter: drop-shadow(0 0 24px var(--color-accent-glow));
+  animation: float 3s ease-in-out infinite;
+}
+
+.splash__title {
+  font-size: 52px;
+  font-weight: 800;
+  letter-spacing: -1.5px;
+  background: linear-gradient(135deg, #f0f2f7 30%, var(--color-accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.splash__tagline {
+  font-size: 16px;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.5px;
+}
+
+.splash__note {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  background: var(--color-surface);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-border);
+}
+
+/* ── Animations ──────────────────────────────────────────────── */
+@keyframes splash-fade-in {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-8px); }
+}

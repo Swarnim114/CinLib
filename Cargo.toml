@@ -1,0 +1,59 @@
+[workspace]
+members = ["cinlib-app"]
+resolver = "2"
+
+[workspace.package]
+version     = "0.1.0"
+edition     = "2021"
+authors     = ["CinLib Contributors"]
+license     = "MIT"
+repository  = "https://github.com/cinlib/cinlib"
+
+# Shared dependency versions — bump here to upgrade everywhere.
+[workspace.dependencies]
+# --- UI ---
+dioxus          = { version = "0.6", features = ["desktop"] }
+
+# --- Async ---
+tokio           = { version = "1", features = ["full"] }
+futures         = "0.3"
+
+# --- Database ---
+sqlx            = { version = "0.8", features = ["runtime-tokio", "sqlite", "macros", "migrate"] }
+
+# --- Serialisation ---
+serde           = { version = "1", features = ["derive"] }
+serde_json      = "1"
+
+# --- HTTP ---
+reqwest         = { version = "0.12", features = ["json", "stream"] }
+
+# --- Filesystem ---
+walkdir         = "2"
+notify          = { version = "7", features = ["serde"] }
+
+# --- Image ---
+image           = { version = "0.25", default-features = false, features = ["jpeg", "png", "webp"] }
+
+# --- Error handling ---
+anyhow          = "1"
+thiserror       = "2"
+
+# --- Logging ---
+tracing         = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt", "ansi"] }
+
+# --- Utilities ---
+chrono          = { version = "0.4", features = ["serde"] }
+uuid            = { version = "1", features = ["v4", "serde"] }
+dirs            = "5"
+once_cell       = "1"
+
+[profile.dev]
+opt-level = 1          # faster incremental builds in dev
+
+[profile.release]
+opt-level     = 3
+lto           = "thin"
+codegen-units = 1
+strip         = true

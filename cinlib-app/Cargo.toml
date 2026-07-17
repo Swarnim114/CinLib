@@ -1,0 +1,51 @@
+[package]
+name        = "cinlib-app"
+description = "CinLib — a fast, beautiful local movie & TV library manager"
+version.workspace     = true
+edition.workspace     = true
+authors.workspace     = true
+license.workspace     = true
+repository.workspace  = true
+
+[[bin]]
+name = "cinlib"
+path = "src/main.rs"
+
+[dependencies]
+# UI
+dioxus              = { workspace = true }
+
+# Async
+tokio               = { workspace = true }
+futures             = { workspace = true }
+
+# Database
+sqlx                = { workspace = true }
+
+# Serialisation
+serde               = { workspace = true }
+serde_json          = { workspace = true }
+
+# HTTP
+reqwest             = { workspace = true }
+
+# Filesystem
+walkdir             = { workspace = true }
+notify              = { workspace = true }
+
+# Image
+image               = { workspace = true }
+
+# Error handling
+anyhow              = { workspace = true }
+thiserror           = { workspace = true }
+
+# Logging
+tracing             = { workspace = true }
+tracing-subscriber  = { workspace = true }
+
+# Utilities
+chrono              = { workspace = true }
+uuid                = { workspace = true }
+dirs                = { workspace = true }
+once_cell           = { workspace = true }

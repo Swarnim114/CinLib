@@ -1,0 +1,5 @@
+/home/kalon/Projects/cinlib/target/debug/deps/sync_wrapper-a90532c795925ca9.d: /home/kalon/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/sync_wrapper-1.0.2/src/lib.rs
+
+/home/kalon/Projects/cinlib/target/debug/deps/libsync_wrapper-a90532c795925ca9.rmeta: /home/kalon/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/sync_wrapper-1.0.2/src/lib.rs
+
+/home/kalon/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/sync_wrapper-1.0.2/src/lib.rs:
