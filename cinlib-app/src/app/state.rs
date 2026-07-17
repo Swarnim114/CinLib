@@ -34,10 +34,14 @@ impl fmt::Debug for DbStatus {
 #[derive(Clone, Debug)]
 pub struct AppState {
     pub db: DbStatus,
+    pub libraries: Vec<crate::domain::Library>,
 }
 
 impl AppState {
     pub fn new() -> Self {
-        Self { db: DbStatus::Initialising }
+        Self { 
+            db: DbStatus::Initialising,
+            libraries: Vec::new(),
+        }
     }
 }

@@ -439,6 +439,7 @@ name = "cinlib-app"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "bytes",
  "chrono",
  "dioxus",
  "dirs 5.0.1",
@@ -447,9 +448,11 @@ dependencies = [
  "notify",
  "once_cell",
  "reqwest",
+ "rfd",
  "serde",
  "serde_json",
  "sqlx",
+ "tempfile",
  "thiserror 2.0.18",
  "tokio",
  "tracing",
