@@ -1,6 +1,7 @@
 target/
 /.claude
 planning/
+test_media/
 
 *.md
 !README.md
