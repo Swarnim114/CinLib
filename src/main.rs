@@ -10,11 +10,11 @@ fn main() {
 
     let mut media_list = Vec::new();
     for path in found_files.iter() {
-        let media = models::media::from_filename(path);
+        let media = services::filename_parser::from_filename(path);
         media_list.push(media);
     }
 
-    let (movies, series_list) = models::media::group_media(media_list);
+    let (movies, series_list) = services::grouping::group_media(media_list);
 
     println!("movies ({}):", movies.len());
     for media in movies.iter() {
