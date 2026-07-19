@@ -26,6 +26,66 @@ impl Media {
     }
 }
 
+// Series is a show made up of multiple episodes, grouped by title
+#[derive(Debug)]
+pub struct Series {
+    pub title: String,
+    pub episodes: Vec<Media>,
+}
+
+// splits scanned media into movies (no season/episode) and series (grouped by title)
+pub fn group_media(media_list: Vec<Media>) -> (Vec<Media>, Vec<Series>) {
+    let mut movies = Vec::new();
+    let mut series_list: Vec<Series> = Vec::new();
+
+    for media in media_list {
+        if media.season.is_none() {
+            movies.push(media);
+            continue;
+        }
+
+        let existing_index = find_series_index(&series_list, &media.title);
+        if existing_index.is_none() {
+            series_list.push(Series {
+                title: media.title.clone(),
+                episodes: vec![media],
+            });
+        } else {
+            let index = existing_index.unwrap();
+            series_list[index].episodes.push(media);
+        }
+    }
+
+    for series in series_list.iter_mut() {
+        sort_episodes(&mut series.episodes);
+    }
+
+    (movies, series_list)
+}
+
+// finds a series in the list with a matching title (case insensitive)
+fn find_series_index(series_list: &Vec<Series>, title: &str) -> Option<usize> {
+    let lower_title = title.to_lowercase();
+
+    for i in 0..series_list.len() {
+        if series_list[i].title.to_lowercase() == lower_title {
+            return Some(i);
+        }
+    }
+
+    None
+}
+
+// sorts episodes by season number then episode number, lowest first
+// sort_by takes a compare function and reorders the list using it
+fn sort_episodes(episodes: &mut Vec<Media>) {
+    episodes.sort_by(|a, b| {
+        let a_key = (a.season.unwrap_or(0), a.episode.unwrap_or(0));
+        let b_key = (b.season.unwrap_or(0), b.episode.unwrap_or(0));
+        a_key.cmp(&b_key)
+    });
+}
+
 // codec tags we can spot in a filename
 const CODEC_WORDS: [&str; 5] = ["x264", "x265", "h264", "h265", "hevc"];
 
@@ -314,4 +374,117 @@ fn is_all_digits(text: &str) -> bool {
         }
     }
     true
+}
+
+// tests only run with `cargo test`, not included in the real app
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn normal_movie_with_brackets() {
+        let path = Path::new("Avengers.Infinity.War.2018.1080p.BluRay.x264-[YTS.AM].mp4");
+        let media = from_filename(path);
+
+        assert_eq!(media.title, "Avengers Infinity War");
+        assert_eq!(media.year, Some(2018));
+        assert_eq!(media.resolution, Some("1080p".to_string()));
+        assert_eq!(media.codec, Some("x264".to_string()));
+        assert_eq!(media.source, Some("bluray".to_string()));
+        assert_eq!(media.extension, "mp4");
+    }
+
+    #[test]
+    fn movie_with_no_year() {
+        let path = Path::new("Some Random Movie.mkv");
+        let media = from_filename(path);
+
+        assert_eq!(media.title, "Some Random Movie");
+        assert_eq!(media.year, None);
+    }
+
+    #[test]
+    fn movie_with_no_brackets() {
+        let path = Path::new("The.Promised.Land.2023.1080p.BluRay.x264.AAC5.1-YTS.MX.mp4");
+        let media = from_filename(path);
+
+        assert_eq!(media.title, "The Promised Land");
+        assert_eq!(media.year, Some(2023));
+    }
+
+    #[test]
+    fn series_episode() {
+        let path = Path::new("Breaking.Bad.S01E03.1080p.BluRay.x264-GROUP.mkv");
+        let media = from_filename(path);
+
+        assert_eq!(media.title, "Breaking Bad");
+        assert_eq!(media.season, Some(1));
+        assert_eq!(media.episode, Some(3));
+    }
+
+    #[test]
+    fn tags_hidden_inside_brackets() {
+        let path = Path::new("[Erai-raws] Look Back - Movie [1080p][HEVC][F80D4C5D].mkv");
+        let media = from_filename(path);
+
+        assert_eq!(media.title, "Look Back Movie");
+        assert_eq!(media.resolution, Some("1080p".to_string()));
+        assert_eq!(media.codec, Some("hevc".to_string()));
+    }
+
+    #[test]
+    fn multi_word_title_no_junk_after() {
+        let path = Path::new("The Grand Budapest Hotel.mkv");
+        let media = from_filename(path);
+
+        assert_eq!(media.title, "The Grand Budapest Hotel");
+    }
+
+    #[test]
+    fn dotfile_does_not_crash() {
+        // .mkv has no real extension by rust's rules (dotfile), stem is ".mkv"
+        let path = Path::new(".mkv");
+        let media = from_filename(path);
+
+        assert_eq!(media.title, "mkv");
+        assert_eq!(media.extension, "");
+    }
+
+    #[test]
+    fn group_media_groups_episodes_by_show() {
+        let ep1 = from_filename(Path::new("Breaking.Bad.S01E01.mkv"));
+        let ep2 = from_filename(Path::new("Breaking.Bad.S01E02.mkv"));
+        let movie = from_filename(Path::new("Some Movie.mkv"));
+
+        let (movies, series_list) = group_media(vec![ep1, ep2, movie]);
+
+        assert_eq!(movies.len(), 1);
+        assert_eq!(series_list.len(), 1);
+        assert_eq!(series_list[0].episodes.len(), 2);
+    }
+
+    #[test]
+    fn group_media_sorts_episodes_in_order() {
+        // fed in out of order on purpose
+        let ep3 = from_filename(Path::new("Show.S01E03.mkv"));
+        let ep1 = from_filename(Path::new("Show.S01E01.mkv"));
+        let ep2 = from_filename(Path::new("Show.S01E02.mkv"));
+
+        let (_movies, series_list) = group_media(vec![ep3, ep1, ep2]);
+
+        assert_eq!(series_list[0].episodes[0].episode, Some(1));
+        assert_eq!(series_list[0].episodes[1].episode, Some(2));
+        assert_eq!(series_list[0].episodes[2].episode, Some(3));
+    }
+
+    #[test]
+    fn group_media_matches_title_case_insensitive() {
+        let ep1 = from_filename(Path::new("breaking.bad.S01E01.mkv"));
+        let ep2 = from_filename(Path::new("Breaking.Bad.S01E02.mkv"));
+
+        let (_movies, series_list) = group_media(vec![ep1, ep2]);
+
+        assert_eq!(series_list.len(), 1);
+        assert_eq!(series_list[0].episodes.len(), 2);
+    }
 }

@@ -8,10 +8,26 @@ fn main() {
 
     let found_files = services::scanner::walk_dir(p);
 
-    println!("found {} video files:", found_files.len());
+    let mut media_list = Vec::new();
     for path in found_files.iter() {
         let media = models::media::from_filename(path);
-        print_media(&media);
+        media_list.push(media);
+    }
+
+    let (movies, series_list) = models::media::group_media(media_list);
+
+    println!("movies ({}):", movies.len());
+    for media in movies.iter() {
+        print_media(media);
+    }
+
+    println!("series ({}):", series_list.len());
+    for series in series_list.iter() {
+        println!("show: {} ({} episodes)", series.title, series.episodes.len());
+        for episode in series.episodes.iter() {
+            print_media(episode);
+        }
+        println!("===");
     }
 }
 
